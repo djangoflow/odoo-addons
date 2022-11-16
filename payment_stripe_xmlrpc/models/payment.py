@@ -73,7 +73,7 @@ class PaymentAcquirerStripeSession(models.Model):
 class SaleOrderRPC(models.Model):
     _inherit = 'sale.order'
 
-    def check_stripe_transaction_done(self):
+    def stripe_check_payment_status(self):
         self.ensure_one()
 
         for tx in self.transaction_ids:
