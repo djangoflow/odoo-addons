@@ -1,6 +1,6 @@
 # coding: utf-8
 
-from odoo import models
+from odoo import models, exceptions
 from odoo.tools.float_utils import float_round
 
 from odoo.addons.payment_stripe.models.payment import INT_CURRENCIES
@@ -77,6 +77,11 @@ class SaleOrderRPC(models.Model):
         self.ensure_one()
 
         for tx in self.transaction_ids:
-            if tx.form_feedback({"reference": tx.reference}, "stripe"):
+            try:
+                tx.form_feedback({"reference": tx.reference}, "stripe")
+            except exceptions.UserError:
+                pass
+
+            if tx.state == 'done':
                 return True
         return False
