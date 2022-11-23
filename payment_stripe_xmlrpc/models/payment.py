@@ -79,6 +79,7 @@ class SaleOrderRPC(models.Model):
         for tx in self.transaction_ids:
             try:
                 tx.form_feedback({"reference": tx.reference}, "stripe")
+                tx._post_process_after_done()
             except exceptions.UserError:
                 pass
 
