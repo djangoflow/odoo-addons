@@ -79,9 +79,15 @@ class SaleOrderRPC(models.Model):
         for tx in self.transaction_ids:
             try:
                 tx.form_feedback({"reference": tx.reference}, "stripe")
-                tx._post_process_after_done()
             except exceptions.UserError:
                 pass
+
+            try:
+                tx._post_process_after_done()
+                self.env.cr.commit()
+            except Exception as e:
+                _logger.exception("Transaction post processing failed")
+                self.env.cr.rollback()
 
             if tx.state == 'done':
                 return True
