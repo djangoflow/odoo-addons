@@ -82,13 +82,14 @@ class SaleOrderRPC(models.Model):
             except exceptions.UserError:
                 pass
 
-            try:
-                tx._post_process_after_done()
-                self.env.cr.commit()
-            except Exception as e:
-                _logger.exception("Transaction post processing failed")
-                self.env.cr.rollback()
-
             if tx.state == 'done':
                 return True
         return False
+
+    def stripe_postprocess_transactions(self):
+        self.ensure_one()
+
+        for tx in self.transaction_ids:
+            tx._post_process_after_done()
+
+        return True
